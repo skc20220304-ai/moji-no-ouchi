@@ -137,7 +137,6 @@ export class GameScene extends Phaser.Scene {
     this.add.triangle(x, y - h * .51, 0, h * .31, w / 2, -h * .37, w, h * .31, 0xf48b65).setStrokeStyle(5 * scale, 0xa95843);
     this.add.rectangle(x, y + h * .04, w, h * .84, 0xffecd0).setStrokeStyle(5 * scale, 0xa95843);
     this.add.text(x, y - h * .04, kana, { fontFamily: '"Yu Kyokasho", "UD Digi Kyokasho NK-R", sans-serif', fontSize: `${Math.max(76, 120 * scale)}px`, color: '#4d3e35', fontStyle: 'bold' }).setOrigin(.5);
-    this.add.text(x, y + h * .50, 'おうち', this.textStyle(Math.max(14, 17 * scale))).setOrigin(.5);
   }
 
   private drawPromptPicture(x: number, y: number, picture: Picture, scale: number, find: boolean) {
