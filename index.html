@@ -9,9 +9,12 @@
   <body>
     <main class="app-shell">
       <header class="topbar">
-        <button id="book-button" class="round-button" type="button" aria-label="ずかんをひらく">📚</button>
-        <div id="progress" class="progress" aria-live="polite">● ○ ○ ○ ○</div>
-        <button id="save-button" class="round-button" type="button" aria-label="あそぶデータをえらぶ">🏠</button>
+        <button id="book-button" class="round-button book-button" type="button" aria-label="ずかんをひらく">📚</button>
+        <div class="adventure-hud" aria-label="ぼうけんのしんちょく">
+          <div id="hearts" class="hearts" aria-label="ハート3こ">♥ ♥ ♥</div>
+          <div id="progress" class="progress" aria-live="polite">● ○ ○ ○ ○</div>
+        </div>
+        <button id="save-button" class="round-button home-button" type="button" aria-label="あそぶデータをえらぶ">🏠</button>
       </header>
       <section id="game-container" class="game-container" aria-label="もじのおうちゲーム"></section>
       <section id="collection" class="modal" hidden aria-modal="true" role="dialog" aria-label="ずかん">
@@ -25,9 +28,11 @@
       <section id="save-picker" class="modal" hidden aria-modal="true" role="dialog" aria-label="あそぶデータをえらぶ">
         <div class="modal-card save-card">
           <button id="close-saves" class="close" type="button" aria-label="とじる">×</button>
+          <div class="save-title-art" aria-hidden="true">☁️　🏡　☁️</div>
           <h1>どのおうち？</h1>
-          <p>おうちごとに ずかんを あつめられるよ</p>
+          <p>おうちごとに　ぼうけんの つづきが あそべるよ</p>
           <div id="save-slots" class="save-slots"></div>
+          <p class="save-help">おなまえの へんこう・おうちの おかたづけは、おとなと いっしょに</p>
         </div>
       </section>
       <section id="complete" class="modal" hidden aria-modal="true" role="dialog" aria-label="おしまい">

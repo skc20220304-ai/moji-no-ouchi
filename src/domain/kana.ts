@@ -1,29 +1,69 @@
 export type KanaRow = 'あ' | 'か' | 'さ' | 'た' | 'な' | 'は' | 'ま' | 'や' | 'ら' | 'わ';
 
+/** A single illustrated word. `assetKey` stays stable when emoji are replaced by WebP art. */
 export interface Picture {
+  id: string;
   word: string;
   emoji: string;
   kana: string;
   row: KanaRow;
+  assetKey: string;
 }
 
-// 文字を大きく見せるため、絵の名前は画面に表示せず、ずかんでだけ確認できる。
+type WordSeed = readonly [word: string, emoji: string];
+
+const rowFor = (kana: string): KanaRow => {
+  if ('あいうえお'.includes(kana)) return 'あ';
+  if ('かきくけこ'.includes(kana)) return 'か';
+  if ('さしすせそ'.includes(kana)) return 'さ';
+  if ('たちつてと'.includes(kana)) return 'た';
+  if ('なにぬねの'.includes(kana)) return 'な';
+  if ('はひふへほ'.includes(kana)) return 'は';
+  if ('まみむめも'.includes(kana)) return 'ま';
+  if ('やゆよ'.includes(kana)) return 'や';
+  if ('らりるれろ'.includes(kana)) return 'ら';
+  return 'わ';
+};
+
+// First release art manifest: four immediately recognisable words for every kana in あ行・か行.
+// These emoji are the temporary renderer; the assetKey is the future transparent WebP filename.
+const firstAreaWords: Readonly<Record<string, readonly WordSeed[]>> = {
+  あ: [['あり', '🐜'], ['あひる', '🦆'], ['あめ', '🌧️'], ['あおむし', '🐛']],
+  い: [['いぬ', '🐶'], ['いちご', '🍓'], ['いす', '🪑'], ['いか', '🦑']],
+  う: [['うさぎ', '🐰'], ['うし', '🐮'], ['うみ', '🌊'], ['うでどけい', '⌚']],
+  え: [['えび', '🦐'], ['えんぴつ', '✏️'], ['えき', '🚉'], ['えだまめ', '🫛']],
+  お: [['おにぎり', '🍙'], ['おおかみ', '🐺'], ['おうち', '🏠'], ['おれんじ', '🍊']],
+  か: [['かめ', '🐢'], ['かさ', '☂️'], ['かに', '🦀'], ['かえる', '🐸']],
+  き: [['きつね', '🦊'], ['きりん', '🦒'], ['きのこ', '🍄'], ['きしゃ', '🚂']],
+  く: [['くじら', '🐋'], ['くるま', '🚗'], ['くま', '🐻'], ['くつ', '👟']],
+  け: [['けーき', '🍰'], ['けむし', '🐛'], ['けいと', '🧶'], ['けしごむ', '🧽']],
+  こ: [['こあら', '🐨'], ['こいぬ', '🐕'], ['こま', '🪀'], ['こおり', '🧊']]
+};
+
+export const adventureKana = Object.keys(firstAreaWords);
+export const vocabulary: readonly Picture[] = Object.entries(firstAreaWords).flatMap(([kana, words]) =>
+  words.map(([word, emoji]) => ({ id: `${kana}-${word}`, word, emoji, kana, row: rowFor(kana), assetKey: `kana/${kana}/${word}` }))
+);
+
+// Kept as a one-picture-per-kana collection for the current game screen and the full 46-kana book.
+const fallbackWords: readonly (readonly [string, string, string])[] = [
+  ['さ', 'さる', '🐒'], ['し', 'しまうま', '🦓'], ['す', 'すいか', '🍉'], ['せ', 'せみ', '🦗'], ['そ', 'そら', '🌤️'],
+  ['た', 'たこ', '🐙'], ['ち', 'ちょうちょ', '🦋'], ['つ', 'つき', '🌙'], ['て', 'てんとうむし', '🐞'], ['と', 'とまと', '🍅'],
+  ['な', 'なす', '🍆'], ['に', 'にんじん', '🥕'], ['ぬ', 'ぬの', '🧣'], ['ね', 'ねこ', '🐱'], ['の', 'のり', '🍘'],
+  ['は', 'はな', '🌷'], ['ひ', 'ひつじ', '🐑'], ['ふ', 'ふね', '⛵'], ['へ', 'へび', '🐍'], ['ほ', 'ほし', '⭐'],
+  ['ま', 'まめ', '🫛'], ['み', 'みかん', '🍊'], ['む', 'むし', '🐛'], ['め', 'めだか', '🐟'], ['も', 'もも', '🍑'],
+  ['や', 'やま', '⛰️'], ['ゆ', 'ゆき', '❄️'], ['よ', 'よっと', '🛥️'],
+  ['ら', 'らいおん', '🦁'], ['り', 'りんご', '🍎'], ['る', 'るすばん', '🏠'], ['れ', 'れもん', '🍋'], ['ろ', 'ろぼっと', '🤖'],
+  ['わ', 'わに', '🐊'], ['を', 'をのはし', '🌉'], ['ん', 'みかん', '🍊']
+];
+
+const primaryPictures = adventureKana.map((kana) => vocabulary.find((item) => item.kana === kana)!);
 export const pictures: readonly Picture[] = [
-  ['あり', '🐜', 'あ'], ['いぬ', '🐶', 'い'], ['うさぎ', '🐰', 'う'], ['えび', '🦐', 'え'], ['おにぎり', '🍙', 'お'],
-  ['かめ', '🐢', 'か'], ['きつね', '🦊', 'き'], ['くじら', '🐋', 'く'], ['けーき', '🍰', 'け'], ['こあら', '🐨', 'こ'],
-  ['さる', '🐒', 'さ'], ['しまうま', '🦓', 'し'], ['すいか', '🍉', 'す'], ['せみ', '🦗', 'せ'], ['そら', '🌤️', 'そ'],
-  ['たこ', '🐙', 'た'], ['ちょうちょ', '🦋', 'ち'], ['つき', '🌙', 'つ'], ['てんとうむし', '🐞', 'て'], ['とまと', '🍅', 'と'],
-  ['なす', '🍆', 'な'], ['にんじん', '🥕', 'に'], ['ぬの', '🧣', 'ぬ'], ['ねこ', '🐱', 'ね'], ['のり', '🍘', 'の'],
-  ['はな', '🌷', 'は'], ['ひつじ', '🐑', 'ひ'], ['ふね', '⛵', 'ふ'], ['へび', '🐍', 'へ'], ['ほし', '⭐', 'ほ'],
-  ['まめ', '🫛', 'ま'], ['みかん', '🍊', 'み'], ['むし', '🐛', 'む'], ['めだか', '🐟', 'め'], ['もも', '🍑', 'も'],
-  ['やま', '⛰️', 'や'], ['ゆき', '❄️', 'ゆ'], ['よっと', '🛥️', 'よ'],
-  ['らいおん', '🦁', 'ら'], ['りんご', '🍎', 'り'], ['るすばん', '🏠', 'る'], ['れもん', '🍋', 'れ'], ['ろぼっと', '🤖', 'ろ'],
-  ['わに', '🐊', 'わ'], ['を', '🌉', 'を'], ['みかん', '🍊', 'ん']
-].map(([word, emoji, kana]) => ({ word, emoji, kana, row: kana === 'を' || kana === 'ん' ? 'わ' : kana[0] as KanaRow }));
+  ...primaryPictures,
+  ...fallbackWords.map(([kana, word, emoji]) => ({ id: `${kana}-${word}`, word, emoji, kana, row: rowFor(kana), assetKey: `kana/${kana}/${word}` }))
+];
 
 export const kanaOrder = pictures.map((picture) => picture.kana);
-
-// 1ラウンドを五十音の1行として進め、最後だけ「わ・を・ん」の特別ステージにする。
 export const learningRows: readonly (readonly string[])[] = [
   ['あ', 'い', 'う', 'え', 'お'], ['か', 'き', 'く', 'け', 'こ'], ['さ', 'し', 'す', 'せ', 'そ'],
   ['た', 'ち', 'つ', 'て', 'と'], ['な', 'に', 'ぬ', 'ね', 'の'], ['は', 'ひ', 'ふ', 'へ', 'ほ'],
@@ -36,13 +76,16 @@ export function pictureForKana(kana: string): Picture {
   return picture;
 }
 
+export function wordsForKana(kana: string): readonly Picture[] {
+  const words = vocabulary.filter((item) => item.kana === kana);
+  return words.length ? words : [pictureForKana(kana)];
+}
+
+/** Compatibility helper for the original Phaser scene. Adventure questions use question.ts instead. */
 export function choicesFor(kana: string): Picture[] {
   const target = pictureForKana(kana);
   const index = kanaOrder.indexOf(kana);
-  const offsets = [7, 19, 31, 43];
-  const distractors = offsets
-    .map((offset) => pictures[(index + offset) % pictures.length])
-    .filter((item) => item.kana !== kana)
-    .slice(0, 2);
+  const distractors = [7, 19, 31, 43].map((offset) => pictures[(index + offset) % pictures.length])
+    .filter((item) => item.kana !== kana).slice(0, 2);
   return [target, ...distractors];
 }
