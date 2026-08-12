@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import './styles.css';
 import { pictureForKana, pictures } from './domain/kana';
-import { currentKana, isComplete, newSession, type Session } from './domain/session';
+import { courseForHome, courseKana, currentKana, isComplete, newSession, type Session } from './domain/session';
 import { activeSlotId, loadProgress, loadSlots, resetProgress, saveCollected, setActiveSlot, type SaveSlot } from './persistence/progress';
 import { GameScene, type PickResult } from './game/GameScene';
 
@@ -26,7 +26,8 @@ function scene() { return game.scene.getScene('game') as GameScene; }
 function renderProgress() { progress.textContent = Array.from({ length: 5 }, (_, index) => index < session.questionIndex ? '●' : '○').join(' '); }
 function startRound() {
   complete.hidden = true;
-  session = newSession(loadProgress().collected);
+  const course = courseForHome(activeSlotId());
+  session = newSession(loadProgress().collected, course);
   renderProgress();
   window.setTimeout(showQuestion, 30);
 }
@@ -59,23 +60,24 @@ function finishRound() {
 }
 function renderCollection() {
   const saved = loadProgress().collected;
-  collectionCount.textContent = `${saved.length} / ${pictures.length}`;
-  collectionGrid.replaceChildren(...pictures.map((item) => {
+  const coursePictures = pictures.filter((item) => courseKana(courseForHome(activeSlotId())).includes(item.kana));
+  collectionCount.textContent = `${saved.filter((kana) => coursePictures.some((item) => item.kana === kana)).length} / ${coursePictures.length}`;
+  collectionGrid.replaceChildren(...coursePictures.map((item) => {
     const known = saved.includes(item.kana);
     const card = document.createElement('div'); card.className = `collection-item${known ? '' : ' unknown'}`;
     card.innerHTML = known ? `<span>${item.emoji}</span><b>${item.kana}</b><small>${item.word}</small>` : '<span>？</span><b>？</b>';
     return card;
   }));
 }
-function slotEmoji(index: number) { return ['🏠', '🏡', '🏰'][index] ?? '🏠'; }
 function renderSaveSlots() {
   const selected = activeSlotId();
-  saveSlots.replaceChildren(...loadSlots().map((slot, index) => {
+  saveSlots.replaceChildren(...loadSlots().map((slot) => {
+    const course = courseForHome(slot.id);
     const button = document.createElement('button');
-    const count = slot.progress.collected.length;
+    const count = slot.progress.collected.filter((kana) => courseKana(course).includes(kana)).length;
     button.type = 'button';
     button.className = `save-slot${slot.id === selected ? ' selected' : ''}`;
-    button.innerHTML = `<span>${slotEmoji(index)}</span><b>おうち ${index + 1}</b><small>${count} / ${pictures.length}</small>`;
+    button.innerHTML = `<span>${course.emoji}</span><b>${course.name}</b><small>${count} / ${courseKana(course).length}</small>`;
     button.addEventListener('click', () => selectSlot(slot));
     return button;
   }));
