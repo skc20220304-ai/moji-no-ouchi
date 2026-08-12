@@ -56,10 +56,13 @@ export class GameScene extends Phaser.Scene {
     const w = 205 * scale; const h = 172 * scale;
     const roof = this.add.triangle(x, y - h * .55, 0, h * .32, w / 2, -h * .38, w, h * .32, 0xf48b65).setStrokeStyle(5 * scale, 0xa95843);
     const body = this.add.rectangle(x, y + h * .04, w, h * .88, 0xffecd0).setStrokeStyle(5 * scale, 0xa95843);
-    const door = this.add.arc(x, y + h * .24, w * .22, 180, 360, false, 0x9bd18a).setStrokeStyle(4 * scale, 0x568a52);
+    // 文字の見分けが最優先。以前の大きなアーチ状ドアは「う」などの下部と重なっていたため、
+    // 文字から離れた小さなドアにする。
+    const door = this.add.rectangle(x, y + h * .41, w * .18, h * .12, 0x9bd18a).setStrokeStyle(3 * scale, 0x568a52);
     const text = this.add.text(x, y - h * .02, kana, { fontFamily: '"Yu Kyokasho", "UD Digi Kyokasho NK-R", sans-serif', fontSize: `${Math.max(74, 120 * scale)}px`, color: '#4d3e35', fontStyle: 'bold' }).setOrigin(.5);
     const label = this.add.text(x, y + h * .58, 'おうち', { fontFamily: 'sans-serif', fontSize: `${Math.max(14, 18 * scale)}px`, color: '#806c5a' }).setOrigin(.5);
-    [roof, body, door, text, label].forEach((item) => item.setDepth(1));
+    [roof, body, door, label].forEach((item) => item.setDepth(1));
+    text.setDepth(2);
   }
 
   private drawCard(x: number, y: number, picture: Picture, scale: number) {
