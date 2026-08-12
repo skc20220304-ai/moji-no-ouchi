@@ -11,7 +11,7 @@
       <header class="topbar">
         <button id="book-button" class="round-button" type="button" aria-label="ずかんをひらく">📚</button>
         <div id="progress" class="progress" aria-live="polite">● ○ ○ ○ ○</div>
-        <button id="save-button" class="round-button" type="button" aria-label="あそぶデータをえらぶ">🏠</button>
+        <button id="save-button" class="round-button" type="button" aria-label="タイトルへもどる">🏡</button>
       </header>
       <section id="game-container" class="game-container" aria-label="もじのおうちゲーム"></section>
       <section id="collection" class="modal" hidden aria-modal="true" role="dialog" aria-label="ずかん">
@@ -22,12 +22,20 @@
           <div id="collection-grid" class="collection-grid"></div>
         </div>
       </section>
-      <section id="save-picker" class="modal" hidden aria-modal="true" role="dialog" aria-label="あそぶデータをえらぶ">
+      <section id="title-screen" class="modal title-screen" aria-modal="true" role="dialog" aria-label="もじのおうち タイトル">
         <div class="modal-card save-card">
-          <button id="close-saves" class="close" type="button" aria-label="とじる">×</button>
-          <h1>どのおうち？</h1>
-          <p>おうちごとに ずかんを あつめられるよ</p>
+          <div class="title-art" aria-hidden="true">🏠　🌳　🏰</div>
+          <h1>もじの おうち</h1>
+          <p>ぼうけんを えらぼう</p>
           <div id="save-slots" class="save-slots"></div>
+        </div>
+      </section>
+      <section id="stage-picker" class="modal" hidden aria-modal="true" role="dialog" aria-label="ステージをえらぶ">
+        <div class="modal-card save-card">
+          <button id="close-stages" class="close" type="button" aria-label="タイトルへもどる">×</button>
+          <h1>どこで あそぶ？</h1>
+          <p id="stage-save-name"></p>
+          <div id="stage-slots" class="save-slots"></div>
         </div>
       </section>
       <section id="complete" class="modal" hidden aria-modal="true" role="dialog" aria-label="おしまい">

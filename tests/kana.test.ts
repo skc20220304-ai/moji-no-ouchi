@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { choicesFor, learningRows, pictures } from '../src/domain/kana';
-import { courseKana, homeCourses, newSession } from '../src/domain/session';
+import { courseKana, newSession, stageCourses } from '../src/domain/session';
 
 describe('kana content', () => {
   it('contains every basic kana exactly once', () => {
@@ -21,15 +21,15 @@ describe('kana content', () => {
   it('starts in the あ行 and moves through rows in order', () => {
     expect(newSession([]).queue).toEqual(learningRows[0]);
     expect(newSession(learningRows[0]).queue).toEqual(learningRows[1]);
-    const finalCourse = homeCourses[2];
+    const finalCourse = stageCourses[2];
     expect(newSession(courseKana(finalCourse).filter((kana) => !learningRows[9].includes(kana)), finalCourse).queue).toEqual(learningRows[9]);
   });
   it('keeps the three homes on non-overlapping kana courses', () => {
-    const courses = homeCourses.map(courseKana);
+    const courses = stageCourses.map(courseKana);
     expect(new Set(courses.flat()).size).toBe(46);
     expect(courses[0]).not.toContain('た');
     expect(courses[1]).toContain('た');
     expect(courses[2]).toContain('ん');
-    expect(newSession([], homeCourses[1]).queue).toEqual(['た', 'ち', 'つ', 'て', 'と']);
+    expect(newSession([], stageCourses[1]).queue).toEqual(['た', 'ち', 'つ', 'て', 'と']);
   });
 });

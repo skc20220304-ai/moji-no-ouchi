@@ -18,6 +18,7 @@ button { font: inherit; cursor: pointer; touch-action: manipulation; }
 .close { position: absolute; top: 10px; right: 12px; width: 48px; height: 48px; border: 0; border-radius: 50%; color: #624b3b; background: #f6d3c7; font-size: 32px; font-weight: 900; }
 .book-card { background: linear-gradient(120deg, #fffef6, #fff1ba); }
 .save-card { background: linear-gradient(120deg, #f8ffef, #d9f0dc); }
+.title-art { margin: -8px 0 3px; font-size: clamp(29px, 7vw, 48px); letter-spacing: -.18em; }
 .save-slots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .save-slot { min-height: 142px; display: grid; place-items: center; align-content: center; gap: 5px; border: 4px solid #7f6755; border-radius: 21px; background: #fffdf7; color: #4d3e35; box-shadow: 0 4px 0 #b79b84; font-weight: 900; }.save-slot span { font-size: 48px; }.save-slot b { font-size: 18px; }.save-slot small { font-size: 15px; }.save-slot.selected { border-color: #e27a58; background: #fff3d6; box-shadow: 0 0 0 4px #f9c984 inset, 0 4px 0 #bf6247; }.save-slot:active { transform: translateY(4px); box-shadow: none; }
 .collection-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 9px; }

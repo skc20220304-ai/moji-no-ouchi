@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import './styles.css';
 import { pictureForKana, pictures } from './domain/kana';
-import { courseForHome, courseKana, currentKana, isComplete, newSession, type Session } from './domain/session';
-import { activeSlotId, loadProgress, loadSlots, resetProgress, saveCollected, setActiveSlot, type SaveSlot } from './persistence/progress';
+import { courseForStage, courseKana, currentKana, isComplete, newSession, stageCourses, type Session, type StageCourse } from './domain/session';
+import { activeSlotId, allCollected, loadProgress, loadSlots, resetProgress, saveCollected, setActiveSlot, setActiveStage, type SaveSlot } from './persistence/progress';
 import { GameScene, type PickResult } from './game/GameScene';
 
 const progress = document.querySelector('#progress')!;
@@ -12,9 +12,13 @@ const collectionGrid = document.querySelector('#collection-grid')!;
 const collectionCount = document.querySelector('#collection-count')!;
 const rewardRow = document.querySelector('#reward-row')!;
 const message = document.querySelector('#complete-message')!;
-const savePicker = document.querySelector('#save-picker') as HTMLElement;
+const titleScreen = document.querySelector('#title-screen') as HTMLElement;
+const stagePicker = document.querySelector('#stage-picker') as HTMLElement;
 const saveSlots = document.querySelector('#save-slots')!;
+const stageSlots = document.querySelector('#stage-slots')!;
+const stageSaveName = document.querySelector('#stage-save-name')!;
 let session: Session;
+let currentCourse: StageCourse = courseForStage('garden');
 
 const game = new Phaser.Game({
   type: Phaser.AUTO, parent: 'game-container', backgroundColor: '#fff8dc', scene: [GameScene],
@@ -24,10 +28,11 @@ const game = new Phaser.Game({
 
 function scene() { return game.scene.getScene('game') as GameScene; }
 function renderProgress() { progress.textContent = Array.from({ length: 5 }, (_, index) => index < session.questionIndex ? '●' : '○').join(' '); }
-function startRound() {
+function startRound(course: StageCourse) {
   complete.hidden = true;
-  const course = courseForHome(activeSlotId());
-  session = newSession(loadProgress().collected, course);
+  currentCourse = course;
+  setActiveStage(course.id);
+  session = newSession(loadProgress(course.id).collected, course);
   renderProgress();
   window.setTimeout(showQuestion, 30);
 }
@@ -42,8 +47,8 @@ function handlePick(result: PickResult) {
     return;
   }
   const kana = currentKana(session);
-  const before = loadProgress().collected;
-  saveCollected(kana);
+  const before = loadProgress(currentCourse.id).collected;
+  saveCollected(kana, currentCourse.id);
   if (!before.includes(kana)) session.collectedThisRound.push(kana);
   session.questionIndex += 1;
   session.mistakes = 0;
@@ -59,10 +64,9 @@ function finishRound() {
   complete.hidden = false;
 }
 function renderCollection() {
-  const saved = loadProgress().collected;
-  const coursePictures = pictures.filter((item) => courseKana(courseForHome(activeSlotId())).includes(item.kana));
-  collectionCount.textContent = `${saved.filter((kana) => coursePictures.some((item) => item.kana === kana)).length} / ${coursePictures.length}`;
-  collectionGrid.replaceChildren(...coursePictures.map((item) => {
+  const saved = allCollected();
+  collectionCount.textContent = `${saved.length} / ${pictures.length}`;
+  collectionGrid.replaceChildren(...pictures.map((item) => {
     const known = saved.includes(item.kana);
     const card = document.createElement('div'); card.className = `collection-item${known ? '' : ' unknown'}`;
     card.innerHTML = known ? `<span>${item.emoji}</span><b>${item.kana}</b><small>${item.word}</small>` : '<span>？</span><b>？</b>';
@@ -71,27 +75,38 @@ function renderCollection() {
 }
 function renderSaveSlots() {
   const selected = activeSlotId();
-  saveSlots.replaceChildren(...loadSlots().map((slot) => {
-    const course = courseForHome(slot.id);
+  saveSlots.replaceChildren(...loadSlots().map((slot, index) => {
     const button = document.createElement('button');
-    const count = slot.progress.collected.filter((kana) => courseKana(course).includes(kana)).length;
-    button.type = 'button';
-    button.className = `save-slot${slot.id === selected ? ' selected' : ''}`;
-    button.innerHTML = `<span>${course.emoji}</span><b>${course.name}</b><small>${count} / ${courseKana(course).length}</small>`;
-    button.addEventListener('click', () => selectSlot(slot));
+    button.type = 'button'; button.className = `save-slot${slot.id === selected ? ' selected' : ''}`;
+    button.innerHTML = `<span>${['🌱', '🌻', '🌟'][index]}</span><b>${slot.name}</b><small>${allCollected(slot).length} / ${pictures.length}</small>`;
+    button.addEventListener('click', () => selectSave(slot));
     return button;
   }));
 }
-function selectSlot(slot: SaveSlot) {
+function selectSave(slot: SaveSlot) {
   setActiveSlot(slot.id);
-  savePicker.hidden = true;
-  startRound();
+  titleScreen.hidden = true;
+  renderStageSlots();
+  stagePicker.hidden = false;
 }
-document.querySelector('#play-again')!.addEventListener('click', startRound);
+function renderStageSlots() {
+  const activeSave = loadSlots().find((slot) => slot.id === activeSlotId()) ?? loadSlots()[0];
+  stageSaveName.textContent = `${activeSave.name} の ステージ`;
+  stageSlots.replaceChildren(...stageCourses.map((course) => {
+    const button = document.createElement('button'); const count = activeSave.stages[course.id].collected.length;
+    button.type = 'button'; button.className = 'save-slot';
+    button.innerHTML = `<span>${course.emoji}</span><b>${course.name}</b><small>${count} / ${courseKana(course).length}</small>`;
+    button.addEventListener('click', () => { stagePicker.hidden = true; startRound(course); });
+    return button;
+  }));
+}
+function showTitle() { complete.hidden = true; stagePicker.hidden = true; renderSaveSlots(); titleScreen.hidden = false; }
+
+document.querySelector('#play-again')!.addEventListener('click', () => startRound(currentCourse));
 document.querySelector('#book-button')!.addEventListener('click', () => { renderCollection(); collection.hidden = false; });
 document.querySelector('#close-book')!.addEventListener('click', () => { collection.hidden = true; });
-document.querySelector('#save-button')!.addEventListener('click', () => { renderSaveSlots(); savePicker.hidden = false; });
-document.querySelector('#close-saves')!.addEventListener('click', () => { savePicker.hidden = true; });
+document.querySelector('#save-button')!.addEventListener('click', showTitle);
+document.querySelector('#close-stages')!.addEventListener('click', showTitle);
 // Reset remains available from the console for parents and test automation, but is not exposed in the child UI.
 void resetProgress;
-window.setTimeout(startRound, 100);
+window.setTimeout(showTitle, 100);
