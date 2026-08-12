@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
+    <meta name="theme-color" content="#fff8dc" />
+    <title>もじのおうち</title>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <button id="book-button" class="round-button" type="button" aria-label="ずかんをひらく">📚</button>
+        <div id="progress" class="progress" aria-live="polite">● ○ ○ ○ ○</div>
+        <button id="save-button" class="round-button" type="button" aria-label="あそぶデータをえらぶ">🏠</button>
+      </header>
+      <section id="game-container" class="game-container" aria-label="もじのおうちゲーム"></section>
+      <section id="collection" class="modal" hidden aria-modal="true" role="dialog" aria-label="ずかん">
+        <div class="modal-card book-card">
+          <button id="close-book" class="close" type="button" aria-label="とじる">×</button>
+          <h1>ずかん</h1>
+          <p id="collection-count"></p>
+          <div id="collection-grid" class="collection-grid"></div>
+        </div>
+      </section>
+      <section id="save-picker" class="modal" hidden aria-modal="true" role="dialog" aria-label="あそぶデータをえらぶ">
+        <div class="modal-card save-card">
+          <button id="close-saves" class="close" type="button" aria-label="とじる">×</button>
+          <h1>どのおうち？</h1>
+          <p>おうちごとに ずかんを あつめられるよ</p>
+          <div id="save-slots" class="save-slots"></div>
+        </div>
+      </section>
+      <section id="complete" class="modal" hidden aria-modal="true" role="dialog" aria-label="おしまい">
+        <div class="modal-card complete-card">
+          <div class="celebrate" aria-hidden="true">✨ 🎉 ✨</div>
+          <h1>やったね！</h1>
+          <p id="complete-message"></p>
+          <div id="reward-row" class="reward-row"></div>
+          <button id="play-again" class="primary-button" type="button">もういっかい</button>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
